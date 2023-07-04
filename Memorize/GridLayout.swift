@@ -34,6 +34,7 @@ struct GridLayout {
                 }
             }
         }
+        
         rowCount = bestLayout.rowCount
         columnCount = bestLayout.columnCount
     }
