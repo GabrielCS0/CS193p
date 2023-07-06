@@ -8,14 +8,30 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    let emojis = ["🫠", "🫣", "🤢", "🥱", "😵‍💫", "🤥", "🤫", "🫡", "🤑", "🤠", "😶‍🌫️", "🥶", "🤯", "🤧", "😮‍💨", "😢", "🫥", "😼", "🫨", "🥸"]
-    @State private var showingEmojiAmount = 20
+    enum EmojisTheme {
+        case faces, flags, animals
+    }
+    
+    let faces = ["🫠", "🫣", "🤢", "🥱", "😵‍💫", "🤥", "🤫", "🫡", "🤑", "🤠", "😶‍🌫️", "🥶", "🤯", "🤧", "😮‍💨", "😢", "🫥", "🫨", "🥸"]
+    let flags = ["🇧🇷", "🇦🇺", "🇯🇵", "🇰🇷", "🇨🇳", "🇦🇷", "🇷🇺", "🇺🇸", "🇵🇹", "🇲🇽", "🇨🇦", "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "🇳🇬", "🇶🇦", "🇬🇷", "🇫🇮", "🇺🇾", "🇲🇨", "🇳🇱", "🇬🇪"]
+    let animals = ["🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐻‍❄️", "🐯", "🦁", "🐮", "🐷", "🐵", "🪿", "🐸", "🐥", "🐊", "🐙"]
+    
+    @State private var emojisCurrentlyShown: [String]
+    private var numberOfCardsShown: Int {
+        return Int.random(in: 4...emojisCurrentlyShown.count)
+    }
+    
+    let columns = [
+        GridItem(.adaptive(minimum: 65))
+    ]
     
     var body: some View {
         VStack {
+            Text("Memorize!").font(.largeTitle)
+            
             ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
-                    ForEach(emojis[0..<showingEmojiAmount], id: \.self) { emoji in
+                LazyVGrid(columns: columns) {
+                    ForEach(emojisCurrentlyShown[0..<numberOfCardsShown], id: \.self) { emoji in
                         CardView(content: emoji)
                             .aspectRatio(2/3, contentMode: .fit)
                     }
@@ -24,28 +40,43 @@ struct EmojiMemoryGameView: View {
             .foregroundColor(.red)
             
             HStack {
-                Button {
-                    if showingEmojiAmount > 1 {
-                        showingEmojiAmount -= 1
-                    }
-                } label: {
-                    Image(systemName: "minus.circle")
-                }
-                
                 Spacer()
-                
-                Button {
-                    if showingEmojiAmount < emojis.count {
-                        showingEmojiAmount += 1
-                    }
-                } label: {
-                    Image(systemName: "plus.circle")
-                }
+                themeButton(.faces, SFSymbol: "face.smiling", describingText: "Faces")
+                Spacer()
+                themeButton(.flags, SFSymbol: "flag", describingText: "Flags")
+                Spacer()
+                themeButton(.animals, SFSymbol: "hare", describingText: "Animals")
+                Spacer()
             }
-            .font(.largeTitle)
             .padding(.horizontal)
         }
         .padding(.horizontal)
+    }
+    
+    func themeButton(_ theme: EmojisTheme, SFSymbol: String, describingText: String) -> some View {
+        Button {
+            changeEmojisTheme(theme)
+        } label: {
+            VStack(spacing: 5) {
+                Image(systemName: SFSymbol).font(.largeTitle)
+                Text(describingText).font(.callout)
+            }
+        }
+    }
+    
+    func changeEmojisTheme(_ theme: EmojisTheme) {
+        switch theme {
+        case .faces:
+            emojisCurrentlyShown = faces.shuffled()
+        case .flags:
+            emojisCurrentlyShown = flags.shuffled()
+        case .animals:
+            emojisCurrentlyShown = animals.shuffled()
+        }
+    }
+    
+    init() {
+        self.emojisCurrentlyShown = self.faces.shuffled()
     }
 }
 
