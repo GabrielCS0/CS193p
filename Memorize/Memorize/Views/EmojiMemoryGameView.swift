@@ -8,43 +8,28 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    @ObservedObject var game: EmojiMemoryGame
-    
-    let columns = [
-        GridItem(.adaptive(minimum: 65)) 
-    ]
+    @ObservedObject var game: EmojiMemoryGameViewModel
     
     var body: some View {
-        ScrollView {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(game.theme.name)
-                        .font(.title)
-                        .bold()
-                    
-                    Text("Your score: \(game.score)")
-                        .font(.subheadline)
+        AspectVGrid(items: game.cards, aspectRatio: 2/3) { card in
+            CardView(card: card)
+                .padding(4)
+                .foregroundColor(game.theme.color)
+                .onTapGesture {
+                    game.choose(card: card)
                 }
-
-                Spacer()
-            }
-            .padding(.bottom)
-            
-            LazyVGrid(columns: columns) {
-                ForEach(game.cards) { card in
-                    CardView(card: card)
-                        .foregroundColor(game.theme.color)
-                        .aspectRatio(2/3, contentMode: .fit)
-                        .onTapGesture {
-                            game.choose(card: card)
-                        }
-                }
-            }
         }
-        .padding()
+        .padding(.horizontal, 5)
+        .padding(.vertical)
+        .navigationTitle("Score: \(game.score)")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            Button("Reset Game") {
-                game.resetGame()
+            ToolbarItem(placement: .navigationBarTrailing) {
+                VStack(alignment: .leading) {
+                    Button("Reset Game") {
+                        game.resetGame()
+                    }
+                }
             }
         }
     }
@@ -52,26 +37,37 @@ struct EmojiMemoryGameView: View {
 
 
 struct CardView: View {
-    let card: MemoryGame<String>.Card
+    let card: EmojiMemoryGameViewModel.Card
     
     var body: some View {
-        ZStack {
-            let shape = RoundedRectangle(cornerRadius: 20)
-            
-            if card.isFaceUp {
-                shape.fill().foregroundColor(.white)
-                shape.strokeBorder(lineWidth: 3)
-                Text(card.content).font(.largeTitle)
-            } else if card.isMatched {
-                shape.opacity(0)
-            } else {
-                shape.fill()
+        GeometryReader { geometry in
+            ZStack {
+                let shape = RoundedRectangle(cornerRadius: DrawingConstant.shapeCornerRadius)
+                
+                if card.isFaceUp {
+                    shape.fill().foregroundColor(.white)
+                    shape.strokeBorder(lineWidth: DrawingConstant.shapeLineWidth)
+                    Pie(startAngle: Angle(degrees: 0-90), endAngle: Angle(degrees: 110-90))
+                        .padding(5)
+                        .opacity(0.6)
+                    Text(card.content).font(font(in: geometry.size))
+                } else if card.isMatched {
+                    shape.opacity(0)
+                } else {
+                    shape.fill()
+                }
             }
         }
     }
     
-    private func fontSize(for size: CGSize) -> CGFloat {
-        min(size.width, size.height) * 0.7
+    private func font(in size: CGSize) -> Font {
+        Font.system(size: min(size.width, size.height) * DrawingConstant.fontScale)
+    }
+    
+    private struct DrawingConstant {
+        static let shapeCornerRadius: CGFloat = 10
+        static let shapeLineWidth: CGFloat = 3
+        static let fontScale = 0.7
     }
 }
 
@@ -79,7 +75,7 @@ struct CardView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            EmojiMemoryGameView(game: EmojiMemoryGame(theme: Theme.example))
+            EmojiMemoryGameView(game: EmojiMemoryGameViewModel(theme: Theme.example))
         }
     }
 }

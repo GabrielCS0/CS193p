@@ -10,7 +10,7 @@ import SwiftUI
 struct Pie: Shape {
     var startAngle: Angle
     var endAngle: Angle
-    var clockWise: Bool = true
+    var clockWise: Bool = false
     
     var animatableData: AnimatablePair<Double, Double> {
         get {
@@ -38,7 +38,7 @@ struct Pie: Shape {
             radius: radius,
             startAngle: startAngle,
             endAngle: endAngle,
-            clockwise: clockWise
+            clockwise: !clockWise
         )
         p.addLine(to: center)
         

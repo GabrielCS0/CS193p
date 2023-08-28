@@ -1,5 +1,5 @@
 //
-//  EmojiMemoryGame.swift
+//  EmojiMemoryGameViewModel.swift
 //  Memorize
 //
 //  Created by Gabriel on 15/03/23.
@@ -7,13 +7,15 @@
 
 import SwiftUI
 
-class EmojiMemoryGame: ObservableObject {
+class EmojiMemoryGameViewModel: ObservableObject {
+    typealias Card = MemoryGame<String>.Card
+    
     @Published private var model: MemoryGame<String>
     @Published private(set) var theme: Theme
     
     init(theme: Theme) {
         self.theme = theme
-        model = EmojiMemoryGame.createMemoryGame(theme: theme)
+        model = EmojiMemoryGameViewModel.createMemoryGame(theme: theme)
     }
     
     private static func createMemoryGame(theme: Theme) -> MemoryGame<String> {
@@ -21,7 +23,7 @@ class EmojiMemoryGame: ObservableObject {
         return MemoryGame<String>(numberOfPairsOfCards: theme.numberOfPairsOfCards) { emojis[$0] }
     }
     
-    var cards: Array<MemoryGame<String>.Card> {
+    var cards: [Card] {
         model.cards
     }
     
@@ -29,11 +31,11 @@ class EmojiMemoryGame: ObservableObject {
         model.score
     }
     
-    func choose(card: MemoryGame<String>.Card) {
+    func choose(card: Card) {
         model.choose(card: card)
     }
     
     func resetGame() {
-        model = EmojiMemoryGame.createMemoryGame(theme: theme)
+        model = EmojiMemoryGameViewModel.createMemoryGame(theme: theme)
     }
 }

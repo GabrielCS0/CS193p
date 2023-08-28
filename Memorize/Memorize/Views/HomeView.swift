@@ -1,5 +1,5 @@
 //
-//  Home.swift
+//  HomeView.swift
 //  Memorize
 //
 //  Created by Gabriel on 31/07/23.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Home: View {
+struct HomeView: View {
     @ObservedObject private var viewModel = HomeViewModel()
     
     var body: some View {
@@ -15,7 +15,7 @@ struct Home: View {
             List {
                 ForEach(viewModel.themes) { theme in
                     NavigationLink {
-                        EmojiMemoryGameView(game: EmojiMemoryGame(theme: theme))
+                        EmojiMemoryGameView(game: EmojiMemoryGameViewModel(theme: theme))
                     } label: {
                         VStack(alignment: .leading) {
                             Text(theme.name)
@@ -56,6 +56,6 @@ struct Home: View {
 
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
-        Home()
+        HomeView()
     }
 }
